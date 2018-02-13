@@ -1,8 +1,10 @@
-from multiprocessing import Process, Queue
+import watchdog, ConfigParser
 
-import bot, watchdog
+config = ConfigParser.ConfigParser()
+config.read('botconfig.cfg')
 
+watchingPatch = config.get('Main', 'path_to_watching')
 
 if __name__ == '__main__':
     print('Log message: program Start')
-    watchdog.watchdog()
+    watchdog.watchdog(watchingPatch)

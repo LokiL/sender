@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import os
+import os, telebot, ConfigParser
 
-import telebot
+config = ConfigParser.ConfigParser()
+config.read('botconfig.cfg')
+botToken = config.get('Main', 'bot_token')
 
-import botToken
-
-bot = telebot.TeleBot(botToken.token)
+bot = telebot.TeleBot(botToken)
 
 class chat_id:
     def __init__(self, start_state):
@@ -19,6 +19,7 @@ current_chat_id = chat_id(0)
 @bot.message_handler(commands=['setchatid'])
 def send_welcome(message):
     bot.send_message(message.chat.id, 'Chat id сохранен')
+    print('Log message: program Start')
     current_chat_id.setValue(message.chat.id)
 
 #test sending
