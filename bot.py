@@ -15,10 +15,6 @@ class chat_id:
 
 current_chat_id = chat_id(0)
 
-@bot.message_handler(commands=['ping'])
-def send_welcome(message):
-    bot.reply_to(current_chat_id.value, "pong")
-
 #tech chat id return
 @bot.message_handler(commands=['setchatid'])
 def send_welcome(message):
@@ -29,16 +25,13 @@ def send_welcome(message):
 @bot.message_handler(commands=['testsend'])
 def echo_all(message):
     bot.send_message(current_chat_id.value, "Начата загрузка файла: " + getFilePath())
-    bot.send_document(current_chat_id.value, sendFile())
-
-
+    bot.send_document(current_chat_id.value, getFileToSend())
 
 # tech functions
 def getFilePath():
     return os.getcwd() + r'\test1.apk'
 
-
-def sendFile():
+def getFileToSend():
     docpatch = os.getcwd() + r'\test1.apk'
     doc = open(docpatch, 'rb')
     return doc
