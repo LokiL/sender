@@ -1,11 +1,11 @@
 import os, time, threading
-import bot
+import telegramModule
 
 
 
 def watchdog(watchingPatch):
-    #start bot in thread
-    botThread = threading.Thread(target=bot.botRun)
+    #start botInstance in thread
+    botThread = threading.Thread(target=telegramModule.botRun)
     botThread.start()
 
     #checking for changing
@@ -18,7 +18,7 @@ def watchdog(watchingPatch):
         if added:
             print("List added: ", ",".join(added))
             try:
-                bot.bot.send_message(bot.current_chat_id.value, str(added))
+                telegramModule.botInstance.send_message(telegramModule.current_chat_id.value, str(added))
             except Exception:
                 print('Exception', Exception)
         before = after

@@ -5,7 +5,7 @@ config = ConfigParser.ConfigParser()
 config.read('botconfig.cfg')
 botToken = config.get('Main', 'bot_token')
 
-bot = telebot.TeleBot(botToken)
+botInstance = telebot.TeleBot(botToken)
 
 class chat_id:
     def __init__(self, start_state):
@@ -16,17 +16,17 @@ class chat_id:
 current_chat_id = chat_id(0)
 
 #tech chat id return
-@bot.message_handler(commands=['setchatid'])
+@botInstance.message_handler(commands=['setchatid'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, 'Chat id сохранен')
+    botInstance.send_message(message.chat.id, 'Chat id сохранен')
     print('Log message: program Start')
     current_chat_id.setValue(message.chat.id)
 
 #test sending
-@bot.message_handler(commands=['testsend'])
+@botInstance.message_handler(commands=['testsend'])
 def echo_all(message):
-    bot.send_message(current_chat_id.value, "Начата загрузка файла: " + getFilePath())
-    bot.send_document(current_chat_id.value, getFileToSend())
+    botInstance.send_message(current_chat_id.value, "Начата загрузка файла: " + getFilePath())
+    botInstance.send_document(current_chat_id.value, getFileToSend())
 
 # tech functions
 def getFilePath():
@@ -38,5 +38,5 @@ def getFileToSend():
     return doc
 
 def botRun():
-    print('Log message: bot online')
-    bot.polling()
+    print('Log message: botInstance online')
+    botInstance.polling()
