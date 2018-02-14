@@ -41,5 +41,6 @@ def watchdogRun(watchingPatch):
 
 
 if __name__ == '__main__':
+    print(r"Current watching path: D:\temp")
     watchingPath = r'D:\temp'
     watchdogRun(watchingPath)
