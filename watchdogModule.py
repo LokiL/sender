@@ -1,4 +1,7 @@
-import os, time
+# -*- coding: utf-8 -*-
+import os
+import time
+
 import telegramModule
 
 
@@ -6,19 +9,23 @@ class DiffCat:
     def __init__(self):
         self.addedList = None
         self.removedList = None
+
     def setAdded(self, added):
         self.addedList = added
+
     def setRemoved(self, removed):
         self.removedList = removed
 
+
 changesCat = DiffCat()
 
+
 def watchdogRun(watchingPatch):
-    #checking for changing
+    # checking for changing
     print('Log message: watchdogRun online')
     before = dict([(files, None) for files in os.listdir(watchingPatch)])
     while 1:
-        time.sleep(3)
+        time.sleep(10)
         after = dict([(files, None) for files in os.listdir(watchingPatch)])
         added = [files for files in after if not files in before]
         removed = [files for files in before if not files in after]
@@ -31,6 +38,7 @@ def watchdogRun(watchingPatch):
             changesCat.setRemoved(removed)
         before = after
         print('Log message: watchdog cycle passed')
+
 
 if __name__ == '__main__':
     watchingPath = r'D:\temp'
