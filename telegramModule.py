@@ -4,39 +4,79 @@ import os, telebot, ConfigParser
 config = ConfigParser.ConfigParser()
 config.read('botconfig.cfg')
 botToken = config.get('Main', 'bot_token')
+watchingPatch = config.get('Main', 'path_to_watching')
 
 botInstance = telebot.TeleBot(botToken)
 
-class chat_id:
-    def __init__(self, start_state):
+class ChatId:
+    def __init__(self):
         self.value = 0
     def setValue(self, chat_id):
         self.value = chat_id
 
-current_chat_id = chat_id(0)
+currentChatId = ChatId()
+currentChatId.value = config.get('Main', 'Working_Chat_Id')
 
-#tech chat id return
+def checkChatId(info):
+    if currentChatId.value == 0:
+        if info:
+            print("Warning, chat id not set!")
+        return 0
+    else:
+        if info:
+            print("Log message: current chat id is " + str(currentChatId.value))
+        return 1
+
 @botInstance.message_handler(commands=['setchatid'])
-def send_welcome(message):
-    botInstance.send_message(message.chat.id, 'Chat id сохранен')
-    print('Log message: program Start')
-    current_chat_id.setValue(message.chat.id)
+def setupChatId(message):
+    currentChatId.setValue(message.chat.id)
+    config.set('Main', 'Working_Chat_Id', currentChatId.value)
+    with open('botconfig.cfg', 'wb') as configfile:
+        config.write(configfile)
+    botInstance.send_message(currentChatId.value, 'Chat id сохранен')
+    print('Log message: chat id: ' + str(message.chat.id) + ' saved')
 
-#test sending
-@botInstance.message_handler(commands=['testsend'])
-def echo_all(message):
-    botInstance.send_message(current_chat_id.value, "Начата загрузка файла: " + getFilePath())
-    botInstance.send_document(current_chat_id.value, getFileToSend())
+def sendLastFile(filePath):
+    if checkChatId(False) == 0:
+        print("Log message: I'm sorry Dave. I'm afraid I can't do that. Chat Id not set.")
+    else:
+        botInstance.send_message(currentChatId.value, "Начата загрузка файла: " + filePath)
+        botInstance.send_document(currentChatId.value, getFileToSend())
 
-# tech functions
-def getFilePath():
-    return os.getcwd() + r'\test1.apk'
+def sendFileChanging(filename):
+    if checkChatId(False) == 0:
+        print("Log message: I'm sorry Dave. I'm afraid I can't do that. Chat Id not set.")
+    else:
+        botInstance.send_message(currentChatId.value, "Начата загрузка файла: " + filename[0])
+        try:
+            botInstance.send_document(currentChatId.value, getFileToSend(filename))
+        except:
+            botInstance.send_message(currentChatId.value, "Log message: something went wrong - ", Exception)
 
-def getFileToSend():
-    docpatch = os.getcwd() + r'\test1.apk'
+        # botInstance.send_message(currentChatId.value, "Изменения " + str(files))
+        # print("Log message: changes sended")
+
+# #test sending
+# @botInstance.message_handler(commands=['testsend'])
+# def echo_all(message):
+#     botInstance.send_message(currentChatId.value, "Начата загрузка файла: " + getFilePath())
+#     botInstance.send_document(currentChatId.value, getFileToSend())
+
+# # tech functions
+# def getFilePath():
+#     return os.getcwd() + r'\test1.apk'
+#
+def botRun():
+    print('Log message: botInstance online')
+    botInstance.polling()
+
+
+def getFileToSend(filename):
+    docpatch = watchingPatch+filename[0]
     doc = open(docpatch, 'rb')
     return doc
 
-def botRun():
-    print('Log message: botInstance online')
+
+
+if __name__ == '__main__':
     botInstance.polling()

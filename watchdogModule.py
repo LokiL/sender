@@ -1,25 +1,37 @@
-import os, time, threading
+import os, time
 import telegramModule
 
 
+class DiffCat:
+    def __init__(self):
+        self.addedList = None
+        self.removedList = None
+    def setAdded(self, added):
+        self.addedList = added
+    def setRemoved(self, removed):
+        self.removedList = removed
 
-def watchdogInstance(watchingPatch):
-    #start botInstance in thread
-    botThread = threading.Thread(target=telegramModule.botRun)
-    botThread.start()
+changesCat = DiffCat()
 
+def watchdogRun(watchingPatch):
     #checking for changing
-    before = dict([(f, None) for f in os.listdir(watchingPatch)])
+    print('Log message: watchdogRun online')
+    before = dict([(files, None) for files in os.listdir(watchingPatch)])
     while 1:
-        print('Log message: watchdogInstance online')
-        time.sleep(10)
-        after = dict([(f, None) for f in os.listdir(watchingPatch)])
-        added = [f for f in after if not f in before]
+        time.sleep(3)
+        after = dict([(files, None) for files in os.listdir(watchingPatch)])
+        added = [files for files in after if not files in before]
+        removed = [files for files in before if not files in after]
         if added:
-            print("List added: ", ",".join(added))
-            try:
-                telegramModule.botInstance.send_message(telegramModule.current_chat_id.value, str(added))
-            except Exception:
-                print('Exception', Exception)
+            print("Log message: list added: ", ",".join(added))
+            changesCat.setAdded(added)
+            telegramModule.sendFileChanging(added)
+        if removed:
+            print("Log message: list removed: ", ",".join(removed))
+            changesCat.setRemoved(removed)
         before = after
-    botThread.join()
+        print('Log message: watchdog cycle passed')
+
+if __name__ == '__main__':
+    watchingPath = r'D:\temp'
+    watchdogRun(watchingPath)
